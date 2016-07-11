@@ -20,72 +20,72 @@ class SubRipText: NSDocument {
     override func makeWindowControllers() {
         // Returns the Storyboard that contains your Document window.
         let storyboard = NSStoryboard(name: "Main", bundle: nil)
-        let windowController = storyboard.instantiateControllerWithIdentifier("SRTWindow") as! NSWindowController
+        let windowController = storyboard.instantiateController(withIdentifier: "SRTWindow") as! NSWindowController
         self.addWindowController(windowController)
     }
 
-    override func windowControllerDidLoadNib(aController: NSWindowController) {
+    override func windowControllerDidLoadNib(_ aController: NSWindowController) {
         super.windowControllerDidLoadNib(aController)
         // Add any code here that needs to be executed once the windowController has loaded the document's window.
     }
 
-    override func dataOfType(typeName: String) throws -> NSData {
+    override func data(ofType typeName: String) throws -> Data {
         guard let output = NSMutableData(capacity: subtitles.count * 1000) else {
             throw NSError(domain: NSOSStatusErrorDomain, code: -1, userInfo: nil)
         }
 
         for subtitle in subtitles where subtitle.include {
-            guard let data = subtitle.subRipRepresentation().dataUsingEncoding(NSUTF8StringEncoding) else {
+            guard let data = subtitle.subRipRepresentation().data(using: String.Encoding.utf8) else {
                 continue
             }
-            output.appendData(data)
+            output.append(data)
         }
 
-        return NSData(data: output)
+        return (NSData(data: output as Data) as Data)
     }
 
-    override var entireFileLoaded: Bool {
+    override var isEntireFileLoaded: Bool {
         return loadingComplete
     }
 
-    override func readFromURL(url: NSURL, ofType typeName: String) throws {
+    override func read(from url: URL, ofType typeName: String) throws {
         guard let filename = url.path else {
-            throw NSError(domain: NSCocoaErrorDomain, code: NSCocoaError.FileReadInvalidFileNameError.rawValue, userInfo: nil)
+            throw NSError(domain: NSCocoaErrorDomain, code: NSCocoaError.fileReadInvalidFileNameError.rawValue, userInfo: nil)
         }
 
-        guard let scriptPath = NSBundle.mainBundle().pathForResource("convert", ofType: "pl") else {
+        guard let scriptPath = Bundle.main.pathForResource("convert", ofType: "pl") else {
             throw NSError(domain: "SubtitleHelper", code: -1, userInfo: nil)
         }
 
-        let task = NSTask()
+        let task = Task()
         task.arguments = [scriptPath, filename]
         task.launchPath = "/usr/bin/perl"
-        let tmpFile = NSTemporaryDirectory().stringByAppendingString("processzz.json")
-        guard NSFileManager.defaultManager().createFileAtPath(tmpFile, contents: nil, attributes: nil) else {
+        let tmpFile = NSTemporaryDirectory() + "processzz.json"
+        guard FileManager.default.createFile(atPath: tmpFile, contents: nil, attributes: nil) else {
             throw NSError(domain: "SubtitleHelper", code: -1, userInfo: nil)
         }
         defer {
-            try! NSFileManager.defaultManager().removeItemAtPath(tmpFile)
+            try! FileManager.default.removeItem(atPath: tmpFile)
         }
 
-        guard let output = NSFileHandle(forWritingAtPath: tmpFile) else {
+        guard let output = FileHandle(forWritingAtPath: tmpFile) else {
             throw NSError(domain: "SubtitleHelper", code: -1, userInfo: nil)
         }
         task.standardOutput = output
-        task.standardError = NSFileHandle.fileHandleWithNullDevice()
+        task.standardError = FileHandle.withNullDevice
 
         task.launch()
         task.waitUntilExit()
 
         output.closeFile()
 
-        guard let data = NSData(contentsOfFile: tmpFile) else {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: tmpFile)) else {
             throw NSError(domain: "SubtitleHelper", code: -1, userInfo: nil)
         }
 
         var json: [[String:AnyObject]]?
         do {
-            json = try NSJSONSerialization.JSONObjectWithData(data, options: NSJSONReadingOptions()) as? [[String:AnyObject]]
+            json = try JSONSerialization.jsonObject(with: data, options: JSONSerialization.ReadingOptions()) as? [[String:AnyObject]]
         } catch let e {
             throw e
         }

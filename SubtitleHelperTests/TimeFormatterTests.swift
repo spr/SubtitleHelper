@@ -27,7 +27,7 @@ class TimeFormatterTests: XCTestCase {
         var numberOut: AnyObject? = nil
         var errorOut: NSString? = nil
 
-        XCTAssertTrue(formatter.getObjectValue(&numberOut, forString: "00:24:58.190", errorDescription: &errorOut))
+        XCTAssertTrue(formatter.getObjectValue(&numberOut, for: "00:24:58.190", errorDescription: &errorOut))
 
         XCTAssertNil(errorOut)
 
@@ -42,7 +42,7 @@ class TimeFormatterTests: XCTestCase {
         var numberOut: AnyObject? = nil
         var errorOut: NSString? = nil
 
-        XCTAssertFalse(formatter.getObjectValue(&numberOut, forString: "BAD", errorDescription: &errorOut))
+        XCTAssertFalse(formatter.getObjectValue(&numberOut, for: "BAD", errorDescription: &errorOut))
 
         XCTAssertNil(numberOut)
 
@@ -57,7 +57,7 @@ class TimeFormatterTests: XCTestCase {
         var numberOut: AnyObject? = nil
         var errorOut: NSString? = nil
 
-        XCTAssertFalse(formatter.getObjectValue(&numberOut, forString: "100:00:00.000", errorDescription: &errorOut))
+        XCTAssertFalse(formatter.getObjectValue(&numberOut, for: "100:00:00.000", errorDescription: &errorOut))
 
         XCTAssertNil(numberOut)
 
@@ -72,7 +72,7 @@ class TimeFormatterTests: XCTestCase {
         var numberOut: AnyObject? = nil
         var errorOut: NSString? = nil
 
-        XCTAssertFalse(formatter.getObjectValue(&numberOut, forString: "00:60:00.000", errorDescription: &errorOut))
+        XCTAssertFalse(formatter.getObjectValue(&numberOut, for: "00:60:00.000", errorDescription: &errorOut))
 
         XCTAssertNil(numberOut)
 
@@ -87,7 +87,7 @@ class TimeFormatterTests: XCTestCase {
         var numberOut: AnyObject? = nil
         var errorOut: NSString? = nil
 
-        XCTAssertFalse(formatter.getObjectValue(&numberOut, forString: "00:00:60.000", errorDescription: &errorOut))
+        XCTAssertFalse(formatter.getObjectValue(&numberOut, for: "00:00:60.000", errorDescription: &errorOut))
 
         XCTAssertNil(numberOut)
 
@@ -102,7 +102,7 @@ class TimeFormatterTests: XCTestCase {
         var numberOut: AnyObject? = nil
         var errorOut: NSString? = nil
 
-        XCTAssertFalse(formatter.getObjectValue(&numberOut, forString: "00:00:00.1000", errorDescription: &errorOut))
+        XCTAssertFalse(formatter.getObjectValue(&numberOut, for: "00:00:00.1000", errorDescription: &errorOut))
 
         XCTAssertNil(numberOut)
 
@@ -114,9 +114,9 @@ class TimeFormatterTests: XCTestCase {
     func testStringForObjectValue() {
         let formatter = TimeFormatter()
 
-        XCTAssertEqual(formatter.stringForObjectValue(NSNumber(double: 1498.19)), "00:24:58.190")
+        XCTAssertEqual(formatter.string(for: NSNumber(value: 1498.19)), "00:24:58.190")
 
-        let failed = formatter.stringForObjectValue("Kilroy was here!")
+        let failed = formatter.string(for: "Kilroy was here!")
         XCTAssertNil(failed)
     }
 

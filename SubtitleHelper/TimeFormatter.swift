@@ -8,42 +8,42 @@
 
 import Cocoa
 
-class TimeFormatter: NSFormatter {
-    override func stringForObjectValue(obj: AnyObject) -> String? {
+class TimeFormatter: Formatter {
+    override func string(for obj: AnyObject?) -> String? {
         guard let number = obj as? NSNumber else {
             return nil
         }
 
-        let time: NSTimeInterval = number.doubleValue
+        let time: TimeInterval = number.doubleValue
 
         return displayTimeRepresentation(time)
     }
 
-    override func getObjectValue(obj: AutoreleasingUnsafeMutablePointer<AnyObject?>, forString string: String, errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>) -> Bool {
+    override func getObjectValue(_ obj: AutoreleasingUnsafeMutablePointer<AnyObject?>?, for string: String, errorDescription error: AutoreleasingUnsafeMutablePointer<NSString?>?) -> Bool {
         do {
             let interval = try timeIntervalFromDisplayTime(string)
-            let number = NSNumber(double: interval)
-            obj.memory = number
+            let number = NSNumber(value: interval)
+            obj?.pointee = number
             
             return true
-        } catch TimeConversionError.ImproperFormat {
-            error.memory = "Passed invalid format, expected: '00:00:00.000'" as NSString
+        } catch TimeConversionError.improperFormat {
+            error?.pointee = "Passed invalid format, expected: '00:00:00.000'" as NSString
 
             return false
-        } catch TimeConversionError.TooManyHours(let passed) {
-            error.memory = "Passed too many hours: '\(passed)', maximum is '99'" as NSString
+        } catch TimeConversionError.tooManyHours(let passed) {
+            error?.pointee = "Passed too many hours: '\(passed)', maximum is '99'" as NSString
 
             return false
-        } catch TimeConversionError.TooManyMinutes(let passed) {
-            error.memory = "Passed too many minutes: '\(passed)', maximum is '59'" as NSString
+        } catch TimeConversionError.tooManyMinutes(let passed) {
+            error?.pointee = "Passed too many minutes: '\(passed)', maximum is '59'" as NSString
 
             return false
-        } catch TimeConversionError.TooManySeconds(let passed) {
-            error.memory = "Passed too many seconds: '\(passed)', maximum is '59'" as NSString
+        } catch TimeConversionError.tooManySeconds(let passed) {
+            error?.pointee = "Passed too many seconds: '\(passed)', maximum is '59'" as NSString
 
             return false
-        } catch TimeConversionError.TooManyMilliseconds(let passed) {
-            error.memory = "Passed too many milliseconds: '\(passed)', maximum is '999'" as NSString
+        } catch TimeConversionError.tooManyMilliseconds(let passed) {
+            error?.pointee = "Passed too many milliseconds: '\(passed)', maximum is '999'" as NSString
 
             return false
         } catch {

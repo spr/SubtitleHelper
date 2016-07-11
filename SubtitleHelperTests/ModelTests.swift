@@ -13,8 +13,8 @@ class ModelTests: XCTestCase {
     let exampleJSON: NSDictionary = [
         "content": "\"Idea Notebook for Obtaining\na Spaceship of My Own.\"",
         "entry": "462",
-        "start": NSNumber(double: 1476.44),
-        "end": NSNumber(double: 1479.37)
+        "start": NSNumber(value: 1476.44),
+        "end": NSNumber(value: 1479.37)
     ]
     let badJSON: NSDictionary = [
         "content": "\"Idea Notebook for Obtaining\na Spaceship of My Own.\"",
@@ -23,8 +23,8 @@ class ModelTests: XCTestCase {
     let moreBadJSON: NSDictionary = [
         "content": "\"Idea Notebook for Obtaining\na Spaceship of My Own.\"",
         "entry": "Not a Number",
-        "start": NSNumber(double: 1476.44),
-        "end": NSNumber(double: 1479.37)
+        "start": NSNumber(value: 1476.44),
+        "end": NSNumber(value: 1479.37)
     ]
 
     override func setUp() {
@@ -63,7 +63,7 @@ class ModelTests: XCTestCase {
     }
 
     func testSubtitleJSONCreationPerformance() {
-        self.measureBlock {
+        self.measure {
             for _ in 0...1000 {
                 _ = Subtitle(json: self.exampleJSON)
             }
@@ -78,6 +78,12 @@ class ModelTests: XCTestCase {
         } else {
             XCTFail()
         }
+    }
+    
+    func testArraySubRipRepresentation() {
+        let subtitles = [Subtitle(json: exampleJSON)!, Subtitle(json: exampleJSON)!]
+        let srt = subtitles.subRipRepresentation()
+        XCTAssertEqual(srt, "462\n00:24:36,440 --> 00:24:39,370\n\"Idea Notebook for Obtaining\na Spaceship of My Own.\"\n\n462\n00:24:36,440 --> 00:24:39,370\n\"Idea Notebook for Obtaining\na Spaceship of My Own.\"\n\n")
     }
 
     func testDisplayTimeConversion() {
@@ -123,7 +129,7 @@ class ModelTests: XCTestCase {
     }
 
     func testTimeIntervalFromDisplayTimePerformance() {
-        self.measureBlock {
+        self.measure {
             for _ in 0...100 {
                 try! timeIntervalFromDisplayTime("00:00:00.000")
                 try! timeIntervalFromDisplayTime("05:24:13.500")
@@ -167,9 +173,9 @@ class ModelTests: XCTestCase {
     }
 
     func testSubRipTimeConversionPerformance() {
-        self.measureBlock {
+        self.measure {
             // Put the code you want to measure the time of here.
-            for i in 0.0.stride(through: 500, by: 0.1) {
+            for i in stride(from: 0.0, through: 500, by: 0.1) {
                 subRipTimeRepresentation(i)
             }
         }

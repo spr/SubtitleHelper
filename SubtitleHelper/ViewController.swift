@@ -20,7 +20,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        subtitleEntryCollectionView.selectable = false
+        subtitleEntryCollectionView.isSelectable = false
         subtitleEntryCollectionView.dataSource = self
     }
 
@@ -30,7 +30,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
         }
     }
 
-    func numberOfSectionsInCollectionView(collectionView: NSCollectionView) -> Int {
+    func numberOfSections(in collectionView: NSCollectionView) -> Int {
         if document != nil {
             return 1
         } else {
@@ -38,7 +38,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
         }
     }
 
-    func collectionView(collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: NSCollectionView, numberOfItemsInSection section: Int) -> Int {
         if let srt = document {
             return srt.subtitles.count
         } else {
@@ -46,16 +46,69 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
         }
     }
 
-    func collectionView(collectionView: NSCollectionView, itemForRepresentedObjectAtIndexPath indexPath: NSIndexPath) -> NSCollectionViewItem {
-        let cell = collectionView.makeItemWithIdentifier("EntryCell", forIndexPath: indexPath)
+    func collectionView(_ collectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath) -> NSCollectionViewItem {
+        let cell = collectionView.makeItem(withIdentifier: "EntryCell", for: indexPath)
         guard let entry = cell as? SubtitleEntryItem,
-            let subtitle = document?.subtitles[indexPath.item]
+            let subtitle = document?.subtitles[(indexPath as NSIndexPath).item]
             else {
             return cell
         }
         entry.setupWithSubtitle(subtitle)
+        entry.referenceIndex = (indexPath as NSIndexPath).item
 
         return entry
+    }
+    
+    func toggleInclude(_ number: NSNumber) {
+        if let document = document {
+            var subtitles = document.subtitles
+            var entry = subtitles[number.intValue]
+            entry.include = !entry.include
+            subtitles[number.intValue] = entry
+            document.subtitles = subtitles
+        }
+    }
+    
+    func updateStartTime(_ info: [String: AnyObject]) {
+        guard let num = (info["entry"] as? NSNumber)?.intValue,
+            let startString = info["value"] as? String else {
+                return
+        }
+        if let document = document, time = try? timeIntervalFromDisplayTime(startString) {
+            var subtitles = document.subtitles
+            var entry = subtitles[num]
+            entry.start = time
+            subtitles[num] = entry
+            document.subtitles = subtitles
+        }
+    }
+    
+    func updateEndTime(_ info: [String: AnyObject]) {
+        guard let num = (info["entry"] as? NSNumber)?.intValue,
+            let endString = info["value"] as? String else {
+                return
+        }
+        if let document = document, time = try? timeIntervalFromDisplayTime(endString) {
+            var subtitles = document.subtitles
+            var entry = subtitles[num - 1]
+            entry.end = time
+            subtitles[num - 1] = entry
+            document.subtitles = subtitles
+        }
+    }
+    
+    func updateContent(_ info: [String: AnyObject]) {
+        guard let num = (info["entry"] as? NSNumber)?.intValue,
+            let content = info["value"] as? String else {
+                return
+        }
+        if let document = document {
+            var subtitles = document.subtitles
+            var entry = subtitles[num - 1]
+            entry.content = content
+            subtitles[num - 1] = entry
+            document.subtitles = subtitles
+        }
     }
 
 }

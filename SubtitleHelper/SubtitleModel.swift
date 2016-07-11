@@ -8,10 +8,14 @@
 
 import Foundation
 
+protocol SubRipSubtitle {
+    func subRipRepresentation() -> String
+}
+
 struct Subtitle {
     var entry: UInt
-    var start: NSTimeInterval
-    var end: NSTimeInterval
+    var start: TimeInterval
+    var end: TimeInterval
     var content: String
     var include: Bool = true
 
@@ -34,19 +38,30 @@ struct Subtitle {
         self.content = content
     }
 
-    init(entry: UInt, start: NSTimeInterval, end: NSTimeInterval, content: String) {
+    init(entry: UInt, start: TimeInterval, end: TimeInterval, content: String) {
         self.entry = entry
         self.start = start
         self.end = end
         self.content = content
     }
+}
 
+extension Subtitle : SubRipSubtitle {
     func subRipRepresentation() -> String {
         return "\(entry)\n\(subRipTimeRepresentation(start)) --> \(subRipTimeRepresentation(end))\n\(content)\n\n"
     }
 }
 
-func subRipTimeRepresentation(time: NSTimeInterval) -> String {
+extension Array where Element:SubRipSubtitle {
+    func subRipRepresentation() -> String {
+        let output = self.reduce("") { (output, srs) -> String in
+            output + srs.subRipRepresentation()
+        }
+        return output
+    }
+}
+
+func subRipTimeRepresentation(_ time: TimeInterval) -> String {
     guard time >= 0.0 else {
         return "00:00:00,000"
     }
@@ -56,7 +71,7 @@ func subRipTimeRepresentation(time: NSTimeInterval) -> String {
     return NSString(format: "%02d:%02d:%02d,%03d", hours, minutes, seconds, milliseconds) as String
 }
 
-func displayTimeRepresentation(time: NSTimeInterval) -> String {
+func displayTimeRepresentation(_ time: TimeInterval) -> String {
     guard time >= 0.0 else {
         return "00:00:00.000"
     }
@@ -66,7 +81,7 @@ func displayTimeRepresentation(time: NSTimeInterval) -> String {
     return NSString(format: "%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds) as String
 }
 
-func editingTimeRepresentation(time: NSTimeInterval) -> String {
+func editingTimeRepresentation(_ time: TimeInterval) -> String {
     guard time >= 0.0 else {
         return "000000000"
     }
@@ -76,7 +91,7 @@ func editingTimeRepresentation(time: NSTimeInterval) -> String {
     return NSString(format: "%02d%02d%02d%03d", hours, minutes, seconds, milliseconds) as String
 }
 
-private func timeComponents(time: NSTimeInterval) -> (UInt, UInt, UInt, UInt) {
+private func timeComponents(_ time: TimeInterval) -> (UInt, UInt, UInt, UInt) {
     let msTime = UInt(time * 1000)
 
     var next: UInt
@@ -92,62 +107,62 @@ private func timeComponents(time: NSTimeInterval) -> (UInt, UInt, UInt, UInt) {
     return (hours, minutes, seconds, milliseconds)
 }
 
-enum TimeConversionError : ErrorType {
-    case ImproperFormat, TooManyHours(hours: UInt), TooManyMinutes(minutes: UInt), TooManySeconds(seconds: UInt), TooManyMilliseconds(milliseconds: UInt)
+enum TimeConversionError : ErrorProtocol {
+    case improperFormat, tooManyHours(hours: UInt), tooManyMinutes(minutes: UInt), tooManySeconds(seconds: UInt), tooManyMilliseconds(milliseconds: UInt)
 }
 
-func timeIntervalFromDisplayTime(displayTime: String) throws -> NSTimeInterval {
-    let scanner = NSScanner.init(string: displayTime)
-    let ptr: UnsafeMutablePointer<UInt64> = UnsafeMutablePointer<UInt64>.alloc(1)
+func timeIntervalFromDisplayTime(_ displayTime: String) throws -> TimeInterval {
+    let scanner = Scanner.init(string: displayTime)
+    let ptr: UnsafeMutablePointer<UInt64> = UnsafeMutablePointer<UInt64>(allocatingCapacity: 1)
 
     if !scanner.scanUnsignedLongLong(ptr) {
-        throw TimeConversionError.ImproperFormat
+        throw TimeConversionError.improperFormat
     }
-    let hours = ptr.memory
+    let hours = ptr.pointee
     if hours > 99 {
-        throw TimeConversionError.TooManyHours(hours: UInt(hours))
+        throw TimeConversionError.tooManyHours(hours: UInt(hours))
     }
 
-    if !scanner.scanString(":", intoString: nil) {
-        throw TimeConversionError.ImproperFormat
+    if !scanner.scanString(":", into: nil) {
+        throw TimeConversionError.improperFormat
     }
 
     if !scanner.scanUnsignedLongLong(ptr) {
-        throw TimeConversionError.ImproperFormat
+        throw TimeConversionError.improperFormat
     }
-    let minutes = ptr.memory
+    let minutes = ptr.pointee
     if minutes > 59 {
-        throw TimeConversionError.TooManyMinutes(minutes: UInt(minutes))
+        throw TimeConversionError.tooManyMinutes(minutes: UInt(minutes))
     }
 
-    if !scanner.scanString(":", intoString: nil) {
-        throw TimeConversionError.ImproperFormat
+    if !scanner.scanString(":", into: nil) {
+        throw TimeConversionError.improperFormat
     }
 
     if !scanner.scanUnsignedLongLong(ptr) {
-        throw TimeConversionError.ImproperFormat
+        throw TimeConversionError.improperFormat
     }
-    let seconds = ptr.memory
+    let seconds = ptr.pointee
     if seconds > 59 {
-        throw TimeConversionError.TooManySeconds(seconds: UInt(seconds))
+        throw TimeConversionError.tooManySeconds(seconds: UInt(seconds))
     }
 
-    if !scanner.scanString(".", intoString: nil) {
-        throw TimeConversionError.ImproperFormat
+    if !scanner.scanString(".", into: nil) {
+        throw TimeConversionError.improperFormat
     }
 
     if !scanner.scanUnsignedLongLong(ptr) {
-        throw TimeConversionError.ImproperFormat
+        throw TimeConversionError.improperFormat
     }
-    let milliseconds = ptr.memory
+    let milliseconds = ptr.pointee
     if milliseconds > 999 {
-        throw TimeConversionError.TooManyMilliseconds(milliseconds: UInt(milliseconds))
+        throw TimeConversionError.tooManyMilliseconds(milliseconds: UInt(milliseconds))
     }
 
-    ptr.dealloc(1)
+    ptr.deallocateCapacity(1)
 
     let total = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000) + milliseconds
-    let interval: NSTimeInterval = Double(total)/1000.0
+    let interval: TimeInterval = Double(total)/1000.0
     
     return interval
 }
