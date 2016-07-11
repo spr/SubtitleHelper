@@ -108,3 +108,32 @@ class SubRipText: NSDocument {
     }
 
 }
+
+protocol SubRipSubtitle {
+    func subRipRepresentation() -> String
+}
+
+extension Subtitle : SubRipSubtitle {
+    func subRipRepresentation() -> String {
+        return "\(entry)\n\(subRipTimeRepresentation(start)) --> \(subRipTimeRepresentation(end))\n\(content)\n\n"
+    }
+}
+
+extension Array where Element:SubRipSubtitle {
+    func subRipRepresentation() -> String {
+        let output = self.reduce("") { (output, srs) -> String in
+            output + srs.subRipRepresentation()
+        }
+        return output
+    }
+}
+
+func subRipTimeRepresentation(_ time: TimeInterval) -> String {
+    guard time >= 0.0 else {
+        return "00:00:00,000"
+    }
+    
+    let (hours, minutes, seconds, milliseconds) = timeComponents(time)
+    
+    return NSString(format: "%02d:%02d:%02d,%03d", hours, minutes, seconds, milliseconds) as String
+}

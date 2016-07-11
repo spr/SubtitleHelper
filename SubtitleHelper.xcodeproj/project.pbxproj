@@ -22,6 +22,7 @@
 		B78E71711CE91E0F0054480F /* TimeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78E71701CE91E0F0054480F /* TimeFormatter.swift */; };
 		B78E71731CE932110054480F /* TimeFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78E71721CE932110054480F /* TimeFormatterTests.swift */; };
 		B7A45BE01D3402730068D207 /* GlobalControlersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A45BDF1D3402730068D207 /* GlobalControlersViewController.swift */; };
+		B7A45BE21D3455FD0068D207 /* TimeHandling.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A45BE11D3455FD0068D207 /* TimeHandling.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +64,7 @@
 		B78E71701CE91E0F0054480F /* TimeFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeFormatter.swift; sourceTree = "<group>"; };
 		B78E71721CE932110054480F /* TimeFormatterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeFormatterTests.swift; sourceTree = "<group>"; };
 		B7A45BDF1D3402730068D207 /* GlobalControlersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalControlersViewController.swift; sourceTree = "<group>"; };
+		B7A45BE11D3455FD0068D207 /* TimeHandling.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeHandling.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +122,7 @@
 				B78E71441CE580AF0054480F /* Main.storyboard */,
 				B78E71471CE580AF0054480F /* Info.plist */,
 				B78E716C1CE900040054480F /* SubtitleModel.swift */,
+				B7A45BE11D3455FD0068D207 /* TimeHandling.swift */,
 				B78E71701CE91E0F0054480F /* TimeFormatter.swift */,
 				B735E75F1CFCC1EE00F70021 /* SubtitleEntryItem.swift */,
 				B735E7821CFCC8DE00F70021 /* SubRipText.swift */,
@@ -293,6 +296,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B78E71411CE580AF0054480F /* ViewController.swift in Sources */,
+				B7A45BE21D3455FD0068D207 /* TimeHandling.swift in Sources */,
 				B78E71711CE91E0F0054480F /* TimeFormatter.swift in Sources */,
 				B78E713F1CE580AF0054480F /* AppDelegate.swift in Sources */,
 				B735E7601CFCC1EE00F70021 /* SubtitleEntryItem.swift in Sources */,
