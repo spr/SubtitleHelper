@@ -17,6 +17,10 @@ class SubRipText: NSDocument {
     override class func autosavesInPlace() -> Bool {
         return false
     }
+    
+    override class func canConcurrentlyReadDocuments(ofType typeName: String) -> Bool {
+        return true
+    }
 
     override func makeWindowControllers() {
         // Returns the Storyboard that contains your Document window.
@@ -53,7 +57,8 @@ class SubRipText: NSDocument {
     }
 
     override func read(from url: URL, ofType typeName: String) throws {
-        guard let filename = url.path else {
+        guard let filepath = url.path,
+        let filename = url.lastPathComponent else {
             throw NSError(domain: NSCocoaErrorDomain, code: NSCocoaError.fileReadInvalidFileNameError.rawValue, userInfo: nil)
         }
 
@@ -62,9 +67,9 @@ class SubRipText: NSDocument {
         }
 
         let task = Task()
-        task.arguments = [scriptPath, filename]
+        task.arguments = [scriptPath, filepath]
         task.launchPath = "/usr/bin/perl"
-        let tmpFile = NSTemporaryDirectory() + "processzz.json"
+        let tmpFile = NSTemporaryDirectory() + "process\(filename).json"
         guard FileManager.default.createFile(atPath: tmpFile, contents: nil, attributes: nil) else {
             throw NSError(domain: "SubtitleHelper", code: -1, userInfo: nil)
         }

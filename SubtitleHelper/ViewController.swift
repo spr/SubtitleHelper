@@ -66,6 +66,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
             entry.include = !entry.include
             subtitles[number.intValue] = entry
             document.subtitles = subtitles
+            document.updateChangeCount(NSDocumentChangeType.changeDone)
         }
     }
     
@@ -80,6 +81,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
             entry.start = time
             subtitles[num] = entry
             document.subtitles = subtitles
+            document.updateChangeCount(NSDocumentChangeType.changeDone)
         }
     }
     
@@ -94,6 +96,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
             entry.end = time
             subtitles[num] = entry
             document.subtitles = subtitles
+            document.updateChangeCount(NSDocumentChangeType.changeDone)
         }
     }
     
@@ -108,6 +111,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
             entry.content = content
             subtitles[num] = entry
             document.subtitles = subtitles
+            document.updateChangeCount(NSDocumentChangeType.changeDone)
         }
     }
 

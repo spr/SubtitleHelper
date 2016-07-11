@@ -15,20 +15,25 @@ class GlobalControlersViewController: NSViewController {
     
     var currentTimeShift: TimeInterval = 0 {
         didSet {
-            guard let document = document else {
-                return
-            }
-            
-            var timeshift = currentTimeShift
-            if (!positiveAdjustment) {
-                timeshift = -1 * timeshift
-            }
-            
-            document.generalTimeShift = timeshift
-            print("Adjustment: \(timeshift)")
+            adjustTimeshift()
         }
     }
+    
     private var positiveAdjustment: Bool = true
+    
+    func adjustTimeshift() {
+        guard let document = document else {
+            return
+        }
+        
+        var timeshift = currentTimeShift
+        if (!positiveAdjustment) {
+            timeshift = -1 * timeshift
+        }
+        
+        document.generalTimeShift = timeshift
+        document.updateChangeCount(NSDocumentChangeType.changeDone)
+    }
     
     var document: SubRipText? {
         return view.window?.windowController?.document as? SubRipText
@@ -42,5 +47,7 @@ class GlobalControlersViewController: NSViewController {
             positiveAdjustment = true
             signButton.title = "+"
         }
+        
+        adjustTimeshift()
     }
 }
