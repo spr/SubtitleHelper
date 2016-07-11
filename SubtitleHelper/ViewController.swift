@@ -90,9 +90,9 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
         }
         if let document = document, time = try? timeIntervalFromDisplayTime(endString) {
             var subtitles = document.subtitles
-            var entry = subtitles[num - 1]
+            var entry = subtitles[num]
             entry.end = time
-            subtitles[num - 1] = entry
+            subtitles[num] = entry
             document.subtitles = subtitles
         }
     }
@@ -104,9 +104,9 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
         }
         if let document = document {
             var subtitles = document.subtitles
-            var entry = subtitles[num - 1]
+            var entry = subtitles[num]
             entry.content = content
-            subtitles[num - 1] = entry
+            subtitles[num] = entry
             document.subtitles = subtitles
         }
     }

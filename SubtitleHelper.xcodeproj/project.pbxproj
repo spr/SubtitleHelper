@@ -21,6 +21,7 @@
 		B78E716F1CE906030054480F /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78E716E1CE906030054480F /* ModelTests.swift */; };
 		B78E71711CE91E0F0054480F /* TimeFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78E71701CE91E0F0054480F /* TimeFormatter.swift */; };
 		B78E71731CE932110054480F /* TimeFormatterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B78E71721CE932110054480F /* TimeFormatterTests.swift */; };
+		B7A45BE01D3402730068D207 /* GlobalControlersViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7A45BDF1D3402730068D207 /* GlobalControlersViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 		B78E716E1CE906030054480F /* ModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		B78E71701CE91E0F0054480F /* TimeFormatter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeFormatter.swift; sourceTree = "<group>"; };
 		B78E71721CE932110054480F /* TimeFormatterTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeFormatterTests.swift; sourceTree = "<group>"; };
+		B7A45BDF1D3402730068D207 /* GlobalControlersViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalControlersViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +124,7 @@
 				B735E75F1CFCC1EE00F70021 /* SubtitleEntryItem.swift */,
 				B735E7821CFCC8DE00F70021 /* SubRipText.swift */,
 				B735E7841CFD042600F70021 /* EntryCell.xib */,
+				B7A45BDF1D3402730068D207 /* GlobalControlersViewController.swift */,
 			);
 			path = SubtitleHelper;
 			sourceTree = "<group>";
@@ -294,6 +297,7 @@
 				B78E713F1CE580AF0054480F /* AppDelegate.swift in Sources */,
 				B735E7601CFCC1EE00F70021 /* SubtitleEntryItem.swift in Sources */,
 				B78E716D1CE900040054480F /* SubtitleModel.swift in Sources */,
+				B7A45BE01D3402730068D207 /* GlobalControlersViewController.swift in Sources */,
 				B735E7831CFCC8DE00F70021 /* SubRipText.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

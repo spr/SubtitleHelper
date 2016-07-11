@@ -119,5 +119,28 @@ class TimeFormatterTests: XCTestCase {
         let failed = formatter.string(for: "Kilroy was here!")
         XCTAssertNil(failed)
     }
+    
+    func testCuriousValue() {
+        let formatter = TimeFormatter()
+        
+        var input = 0.7
+        input += 0.1
+        
+        let result = formatter.string(for: NSNumber(value: input))
+        
+        XCTAssertEqual(result, "00:00:00.799")
+        
+        var numberOut: AnyObject? = nil
+        var errorOut: NSString? = nil
+        
+        XCTAssertTrue(formatter.getObjectValue(&numberOut, for: "00:00:00.700", errorDescription: &errorOut))
+        
+        guard let num = (numberOut as? NSNumber)?.doubleValue else {
+            XCTFail()
+            return
+        }
+        
+        XCTAssertEqual(num, 0.7)
+    }
 
 }

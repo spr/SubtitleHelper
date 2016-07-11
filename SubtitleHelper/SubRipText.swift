@@ -11,6 +11,7 @@ import Cocoa
 class SubRipText: NSDocument {
 
     var subtitles: [Subtitle] = []
+    var generalTimeShift: TimeInterval = 0
     var loadingComplete = false
 
     override class func autosavesInPlace() -> Bool {
@@ -35,7 +36,10 @@ class SubRipText: NSDocument {
         }
 
         for subtitle in subtitles where subtitle.include {
-            guard let data = subtitle.subRipRepresentation().data(using: String.Encoding.utf8) else {
+            var current = subtitle
+            current.start += generalTimeShift
+            current.end += generalTimeShift
+            guard let data = current.subRipRepresentation().data(using: String.Encoding.utf8) else {
                 continue
             }
             output.append(data)
