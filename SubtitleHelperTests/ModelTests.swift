@@ -131,9 +131,9 @@ class ModelTests: XCTestCase {
     func testTimeIntervalFromDisplayTimePerformance() {
         self.measure {
             for _ in 0...100 {
-                try! timeIntervalFromDisplayTime("00:00:00.000")
-                try! timeIntervalFromDisplayTime("05:24:13.500")
-                try! timeIntervalFromDisplayTime("01:42:44.607")
+                _ = try! timeIntervalFromDisplayTime("00:00:00.000")
+                _ = try! timeIntervalFromDisplayTime("05:24:13.500")
+                _ = try! timeIntervalFromDisplayTime("01:42:44.607")
             }
         }
     }
@@ -156,27 +156,27 @@ class ModelTests: XCTestCase {
 
     func testSubRipTimeConversion() {
         // Some basics
-        XCTAssertEqual(subRipTimeRepresentation(0.6), "00:00:00,600")
-        XCTAssertEqual(subRipTimeRepresentation(1498.19), "00:24:58,190")
-        XCTAssertEqual(subRipTimeRepresentation(19999.051), "05:33:19,051")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(0.6), "00:00:00,600")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(1498.19), "00:24:58,190")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(19999.051), "05:33:19,051")
 
         // Test extremes
-        XCTAssertEqual(subRipTimeRepresentation(0.0), "00:00:00,000")
-        XCTAssertEqual(subRipTimeRepresentation(359999.999), "99:59:59,999")
-        XCTAssertEqual(subRipTimeRepresentation(1.0001), "00:00:01,000")
-        XCTAssertEqual(subRipTimeRepresentation(1.0005), "00:00:01,000")
-        XCTAssertEqual(subRipTimeRepresentation(1.0009), "00:00:01,000")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(0.0), "00:00:00,000")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(359999.999), "99:59:59,999")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(1.0001), "00:00:01,000")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(1.0005), "00:00:01,000")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(1.0009), "00:00:01,000")
 
         // Techincally invalid, and will never happen
-        XCTAssertEqual(subRipTimeRepresentation(360000.0), "100:00:00,000")
-        XCTAssertEqual(subRipTimeRepresentation(-1.0), "00:00:00,000")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(360000.0), "100:00:00,000")
+        XCTAssertEqual(Subtitle.subRipTimeRepresentation(-1.0), "00:00:00,000")
     }
 
     func testSubRipTimeConversionPerformance() {
         self.measure {
             // Put the code you want to measure the time of here.
             for i in stride(from: 0.0, through: 500, by: 0.1) {
-                subRipTimeRepresentation(i)
+                _ = Subtitle.subRipTimeRepresentation(i)
             }
         }
     }

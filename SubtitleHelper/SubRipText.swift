@@ -25,8 +25,6 @@ class SubRipText: NSDocument {
     override class func canConcurrentlyReadDocuments(ofType typeName: String) -> Bool {
         return true
     }
-    
-    
 
     override func makeWindowControllers() {
         // Returns the Storyboard that contains your Document window.
@@ -123,6 +121,7 @@ extension Notification.Name {
     static let SubRipTextUpdatedTimeshift = Notification.Name("SubRipTextUpdatedTimeshift")
 }
 
+// Undo handling
 extension SubRipText {
     
     class SubRipTextUndoState : NSObject {
@@ -178,13 +177,24 @@ extension SubRipText {
     }
 }
 
+// Extensions for the low level model
 protocol SubRipSubtitle {
     func subRipRepresentation() -> String
 }
 
 extension Subtitle : SubRipSubtitle {
     func subRipRepresentation() -> String {
-        return "\(entry)\n\(subRipTimeRepresentation(start)) --> \(subRipTimeRepresentation(end))\n\(content)\n\n"
+        return "\(entry)\n\(Subtitle.subRipTimeRepresentation(start)) --> \(Subtitle.subRipTimeRepresentation(end))\n\(content)\n\n"
+    }
+    
+    static func subRipTimeRepresentation(_ time: TimeInterval) -> String {
+        guard time >= 0.0 else {
+            return "00:00:00,000"
+        }
+        
+        let (hours, minutes, seconds, milliseconds) = timeComponents(time)
+        
+        return NSString(format: "%02d:%02d:%02d,%03d", hours, minutes, seconds, milliseconds) as String
     }
 }
 
@@ -195,14 +205,4 @@ extension Array where Element:SubRipSubtitle {
         }
         return output
     }
-}
-
-func subRipTimeRepresentation(_ time: TimeInterval) -> String {
-    guard time >= 0.0 else {
-        return "00:00:00,000"
-    }
-    
-    let (hours, minutes, seconds, milliseconds) = timeComponents(time)
-    
-    return NSString(format: "%02d:%02d:%02d,%03d", hours, minutes, seconds, milliseconds) as String
 }
