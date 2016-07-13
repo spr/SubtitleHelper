@@ -22,6 +22,17 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
         // Do any additional setup after loading the view.
         subtitleEntryCollectionView.isSelectable = false
         subtitleEntryCollectionView.dataSource = self
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(update), name: Notification.Name.SubRipTextUpdatedEntry, object: document)
+    }
+    
+    func update(notification: Notification) {
+        guard let index = (notification.userInfo?[Notification.Name.SubRipTextUpdatedEntryIndexKey] as? NSNumber)?.intValue else {
+                return
+        }
+        let indexPath = IndexPath(item: index, section: 0)
+        let set = Set(arrayLiteral: indexPath)
+        subtitleEntryCollectionView.reloadItems(at: set)
     }
 
     override var representedObject: AnyObject? {
@@ -61,12 +72,9 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
     
     func toggleInclude(_ number: NSNumber) {
         if let document = document {
-            var subtitles = document.subtitles
-            var entry = subtitles[number.intValue]
+            var entry = document.subtitles[number.intValue]
             entry.include = !entry.include
-            subtitles[number.intValue] = entry
-            document.subtitles = subtitles
-            document.updateChangeCount(NSDocumentChangeType.changeDone)
+            document.update(changedSubtitle: entry, subtitleIndex: number.intValue)
         }
     }
     
@@ -76,12 +84,9 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
                 return
         }
         if let document = document, time = try? timeIntervalFromDisplayTime(startString) {
-            var subtitles = document.subtitles
-            var entry = subtitles[num]
+            var entry = document.subtitles[num]
             entry.start = time
-            subtitles[num] = entry
-            document.subtitles = subtitles
-            document.updateChangeCount(NSDocumentChangeType.changeDone)
+            document.update(changedSubtitle: entry, subtitleIndex: num)
         }
     }
     
@@ -91,12 +96,9 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
                 return
         }
         if let document = document, time = try? timeIntervalFromDisplayTime(endString) {
-            var subtitles = document.subtitles
-            var entry = subtitles[num]
+            var entry = document.subtitles[num]
             entry.end = time
-            subtitles[num] = entry
-            document.subtitles = subtitles
-            document.updateChangeCount(NSDocumentChangeType.changeDone)
+            document.update(changedSubtitle: entry, subtitleIndex: num)
         }
     }
     
@@ -106,12 +108,9 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
                 return
         }
         if let document = document {
-            var subtitles = document.subtitles
-            var entry = subtitles[num]
+            var entry = document.subtitles[num]
             entry.content = content
-            subtitles[num] = entry
-            document.subtitles = subtitles
-            document.updateChangeCount(NSDocumentChangeType.changeDone)
+            document.update(changedSubtitle: entry, subtitleIndex: num)
         }
     }
 

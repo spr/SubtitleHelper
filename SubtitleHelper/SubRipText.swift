@@ -14,6 +14,10 @@ class SubRipText: NSDocument {
     var generalTimeShift: TimeInterval = 0
     var loadingComplete = false
 
+    override var isEntireFileLoaded: Bool {
+        return loadingComplete
+    }
+    
     override class func autosavesInPlace() -> Bool {
         return false
     }
@@ -21,6 +25,8 @@ class SubRipText: NSDocument {
     override class func canConcurrentlyReadDocuments(ofType typeName: String) -> Bool {
         return true
     }
+    
+    
 
     override func makeWindowControllers() {
         // Returns the Storyboard that contains your Document window.
@@ -52,9 +58,6 @@ class SubRipText: NSDocument {
         return (NSData(data: output as Data) as Data)
     }
 
-    override var isEntireFileLoaded: Bool {
-        return loadingComplete
-    }
 
     override func read(from url: URL, ofType typeName: String) throws {
         guard let filepath = url.path,
@@ -112,6 +115,67 @@ class SubRipText: NSDocument {
         loadingComplete = true
     }
 
+}
+
+extension Notification.Name {
+    static let SubRipTextUpdatedEntry = Notification.Name("SubRipTextUpdatedEntry")
+    static let SubRipTextUpdatedEntryIndexKey = "index"
+    static let SubRipTextUpdatedTimeshift = Notification.Name("SubRipTextUpdatedTimeshift")
+}
+
+extension SubRipText {
+    
+    class SubRipTextUndoState : NSObject {
+        var changedSubtitle: Subtitle? = nil
+        var subtitleIndex: Int? = nil
+        var generalTimeShift: TimeInterval? = nil
+        
+        init(changedSubtitle: Subtitle? = nil, subtitleIndex: Int? = nil, generalTimeShift: TimeInterval? = nil) {
+            self.changedSubtitle = changedSubtitle
+            self.subtitleIndex = subtitleIndex
+            self.generalTimeShift = generalTimeShift
+            super.init()
+        }
+    }
+    
+    func update(changedSubtitle: Subtitle? = nil, subtitleIndex: Int? = nil, newTimeshift: TimeInterval? = nil) {
+        var oldSubtitle: Subtitle? = nil
+        var oldTimeshift: TimeInterval? = nil
+        
+        if let changedSubtitle = changedSubtitle, let subtitleIndex = subtitleIndex {
+            oldSubtitle = subtitles[subtitleIndex]
+            subtitles[subtitleIndex] = changedSubtitle
+        }
+        if let newTimeshift = newTimeshift {
+            oldTimeshift = generalTimeShift
+            generalTimeShift = newTimeshift
+        }
+        
+        let undoState = SubRipTextUndoState(changedSubtitle: oldSubtitle, subtitleIndex: subtitleIndex, generalTimeShift: oldTimeshift)
+        
+        undoManager?.prepare(withInvocationTarget: self).update(undoState: undoState)
+        updateChangeCount(NSDocumentChangeType.changeDone)
+    }
+    
+    func update(undoState: SubRipTextUndoState) {
+        var redoSubtitle: Subtitle? = nil
+        var redoTimeshift: TimeInterval? = nil
+        
+        if let subtitle = undoState.changedSubtitle, let index = undoState.subtitleIndex {
+            redoSubtitle = subtitles[index]
+            subtitles[index] = subtitle
+            NotificationCenter.default.post(name: Notification.Name.SubRipTextUpdatedEntry, object: self, userInfo: [Notification.Name.SubRipTextUpdatedEntryIndexKey: NSNumber(value: index)])
+        }
+        if let timeshift = undoState.generalTimeShift {
+            redoTimeshift = generalTimeShift
+            generalTimeShift = timeshift
+            NotificationCenter.default.post(name: Notification.Name.SubRipTextUpdatedTimeshift, object: self)
+        }
+        
+        let redoState = SubRipTextUndoState(changedSubtitle: redoSubtitle, subtitleIndex: undoState.subtitleIndex, generalTimeShift: redoTimeshift)
+        
+        undoManager?.prepare(withInvocationTarget: self).update(undoState: redoState)
+    }
 }
 
 protocol SubRipSubtitle {

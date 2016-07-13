@@ -13,13 +13,42 @@ class GlobalControlersViewController: NSViewController {
     @IBOutlet weak var signButton: NSButton!
     @IBOutlet weak var timeshiftField: NSTextField!
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(update), name: Notification.Name.SubRipTextUpdatedTimeshift, object: document)
+    }
+    
+    func update(notification: Notification) {
+        guard let document = self.document else {
+            return
+        }
+        ignoreUpdateOnce = true
+        willChangeValue(forKey: "currentTimeShift")
+        currentTimeShift = abs(document.generalTimeShift)
+        didChangeValue(forKey: "currentTimeShift")
+        positiveAdjustment = document.generalTimeShift >= 0
+    }
+    
+    var ignoreUpdateOnce = false
     var currentTimeShift: TimeInterval = 0 {
         didSet {
-            adjustTimeshift()
+            if !ignoreUpdateOnce {
+                adjustTimeshift()
+            }
+            ignoreUpdateOnce = false
         }
     }
     
-    private var positiveAdjustment: Bool = true
+    private var positiveAdjustment: Bool = true {
+        didSet {
+            if positiveAdjustment {
+                signButton.title = "+"
+            } else {
+                signButton.title = "-"
+            }
+        }
+    }
     
     func adjustTimeshift() {
         guard let document = document else {
@@ -31,8 +60,7 @@ class GlobalControlersViewController: NSViewController {
             timeshift = -1 * timeshift
         }
         
-        document.generalTimeShift = timeshift
-        document.updateChangeCount(NSDocumentChangeType.changeDone)
+        document.update(newTimeshift: timeshift)
     }
     
     var document: SubRipText? {
@@ -40,13 +68,7 @@ class GlobalControlersViewController: NSViewController {
     }
 
     @IBAction func changeSign(_ sender: NSButton) {
-        if positiveAdjustment {
-            positiveAdjustment = false
-            signButton.title = "-"
-        } else {
-            positiveAdjustment = true
-            signButton.title = "+"
-        }
+        positiveAdjustment = !positiveAdjustment
         
         adjustTimeshift()
     }
