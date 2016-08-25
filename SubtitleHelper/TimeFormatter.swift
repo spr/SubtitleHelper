@@ -9,7 +9,7 @@
 import Cocoa
 
 class TimeFormatter: Formatter {
-    override func string(for obj: AnyObject?) -> String? {
+    override func string(for obj: Any?) -> String? {
         guard let number = obj as? NSNumber else {
             return nil
         }

@@ -35,9 +35,9 @@ struct Subtitle {
     /// This is SubRip specific today
     init?(json: NSDictionary) {
         guard let entryString = json["entry"] as? String,
-            startNumber = json["start"] as? NSNumber,
-            endNumber = json["end"] as? NSNumber,
-            content = json["content"] as? String
+            let startNumber = json["start"] as? NSNumber,
+            let endNumber = json["end"] as? NSNumber,
+            let content = json["content"] as? String
             else {
                 return nil
         }

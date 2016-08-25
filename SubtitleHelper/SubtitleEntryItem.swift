@@ -29,7 +29,7 @@ class SubtitleEntryItem: NSCollectionViewItem, NSTextFieldDelegate {
         endTime.objectValue = nil
         content.stringValue = ""
         indexLabel.stringValue = "#"
-        include.state = NSControlState.on.rawValue
+        include.state = 1
     }
 
     func setupWithSubtitle(_ subtitle: Subtitle) {
@@ -37,7 +37,7 @@ class SubtitleEntryItem: NSCollectionViewItem, NSTextFieldDelegate {
         endTime.objectValue = NSNumber(value: subtitle.end)
         content.stringValue = subtitle.content
         indexLabel.stringValue = "\(subtitle.entry)"
-        include.state = subtitle.include ? NSControlState.on.rawValue : NSControlState.off.rawValue
+        include.state = subtitle.include ? 1 : 0
     }
     
     @IBAction func toggleInclude(_ sender: NSButton) {

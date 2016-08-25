@@ -35,7 +35,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
         subtitleEntryCollectionView.reloadItems(at: set)
     }
 
-    override var representedObject: AnyObject? {
+    override var representedObject: Any? {
         didSet {
         // Update the view, if already loaded.
         }
@@ -83,7 +83,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
             let startString = info["value"] as? String else {
                 return
         }
-        if let document = document, time = try? timeIntervalFromDisplayTime(startString) {
+        if let document = document, let time = try? timeIntervalFromDisplayTime(startString) {
             var entry = document.subtitles[num]
             entry.start = time
             document.update(changedSubtitle: entry, subtitleIndex: num)
@@ -95,7 +95,7 @@ class ViewController: NSViewController, NSCollectionViewDataSource {
             let endString = info["value"] as? String else {
                 return
         }
-        if let document = document, time = try? timeIntervalFromDisplayTime(endString) {
+        if let document = document, let time = try? timeIntervalFromDisplayTime(endString) {
             var entry = document.subtitles[num]
             entry.end = time
             document.update(changedSubtitle: entry, subtitleIndex: num)

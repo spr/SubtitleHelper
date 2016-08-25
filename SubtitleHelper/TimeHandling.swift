@@ -44,13 +44,13 @@ internal func timeComponents(_ time: TimeInterval) -> (UInt, UInt, UInt, UInt) {
     return (hours, minutes, seconds, milliseconds)
 }
 
-enum TimeConversionError : ErrorProtocol {
+enum TimeConversionError : Error {
     case improperFormat, tooManyHours(hours: UInt), tooManyMinutes(minutes: UInt), tooManySeconds(seconds: UInt), tooManyMilliseconds(milliseconds: UInt)
 }
 
 func timeIntervalFromDisplayTime(_ displayTime: String) throws -> TimeInterval {
     let scanner = Scanner.init(string: displayTime)
-    let ptr: UnsafeMutablePointer<UInt64> = UnsafeMutablePointer<UInt64>(allocatingCapacity: 1)
+    let ptr: UnsafeMutablePointer<UInt64> = UnsafeMutablePointer<UInt64>.allocate(capacity: 1)
     
     if !scanner.scanUnsignedLongLong(ptr) {
         throw TimeConversionError.improperFormat
@@ -96,7 +96,7 @@ func timeIntervalFromDisplayTime(_ displayTime: String) throws -> TimeInterval {
         throw TimeConversionError.tooManyMilliseconds(milliseconds: UInt(milliseconds))
     }
     
-    ptr.deallocateCapacity(1)
+    ptr.deallocate(capacity: 1)
     
     let total = (hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000) + milliseconds
     let interval: TimeInterval = Double(total)/1000.0

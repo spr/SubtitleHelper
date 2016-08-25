@@ -58,16 +58,17 @@ class SubRipText: NSDocument {
 
 
     override func read(from url: URL, ofType typeName: String) throws {
-        guard let filepath = url.path,
-        let filename = url.lastPathComponent else {
-            throw NSError(domain: NSCocoaErrorDomain, code: NSCocoaError.fileReadInvalidFileNameError.rawValue, userInfo: nil)
+        let filepath = url.path
+        let filename = url.lastPathComponent
+        guard !filepath.isEmpty && !filename.isEmpty else {
+            throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.fileReadInvalidFileNameError.rawValue, userInfo: nil)
         }
 
-        guard let scriptPath = Bundle.main.pathForResource("convert", ofType: "pl") else {
+        guard let scriptPath = Bundle.main.path(forResource: "convert", ofType: "pl") else {
             throw NSError(domain: "SubtitleHelper", code: -1, userInfo: nil)
         }
 
-        let task = Task()
+        let task = Process()
         task.arguments = [scriptPath, filepath]
         task.launchPath = "/usr/bin/perl"
         let tmpFile = NSTemporaryDirectory() + "process\(filename).json"
@@ -82,7 +83,7 @@ class SubRipText: NSDocument {
             throw NSError(domain: "SubtitleHelper", code: -1, userInfo: nil)
         }
         task.standardOutput = output
-        task.standardError = FileHandle.withNullDevice
+        task.standardError = FileHandle.nullDevice
 
         task.launch()
         task.waitUntilExit()
@@ -105,7 +106,7 @@ class SubRipText: NSDocument {
         }
 
         for model in models {
-            if let generated = Subtitle(json: model) {
+            if let generated = Subtitle(json: model as NSDictionary) {
                 subtitles.append(generated)
             }
         }
@@ -151,8 +152,11 @@ extension SubRipText {
         }
         
         let undoState = SubRipTextUndoState(changedSubtitle: oldSubtitle, subtitleIndex: subtitleIndex, generalTimeShift: oldTimeshift)
-        
-        undoManager?.prepare(withInvocationTarget: self).update(undoState: undoState)
+
+        undoManager?.registerUndo(withTarget: self, handler: { (obj) in
+            obj.update(undoState: undoState)
+        })
+
         updateChangeCount(NSDocumentChangeType.changeDone)
     }
     
@@ -172,8 +176,10 @@ extension SubRipText {
         }
         
         let redoState = SubRipTextUndoState(changedSubtitle: redoSubtitle, subtitleIndex: undoState.subtitleIndex, generalTimeShift: redoTimeshift)
-        
-        undoManager?.prepare(withInvocationTarget: self).update(undoState: redoState)
+
+        undoManager?.registerUndo(withTarget: self, handler: { (obj) in
+            obj.update(undoState: redoState)
+        })
     }
 }
 
