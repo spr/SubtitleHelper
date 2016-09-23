@@ -61,7 +61,7 @@ class SubRipText: NSDocument {
         let filepath = url.path
         let filename = url.lastPathComponent
         guard !filepath.isEmpty && !filename.isEmpty else {
-            throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.fileReadInvalidFileNameError.rawValue, userInfo: nil)
+            throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.fileReadInvalidFileName.rawValue, userInfo: nil)
         }
 
         guard let scriptPath = Bundle.main.path(forResource: "convert", ofType: "pl") else {
